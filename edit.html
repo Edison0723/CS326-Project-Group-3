@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+  <style>
+    .form {
+      width: 600px;
+      margin: 0 auto;
+      margin-top: 40px;
+    }
+
+    .form_item {
+      margin-bottom: 10px;
+    }
+
+    .form_item input {
+      width: 300px;
+      height: 30px;
+      border: 1px solide #ddd;
+      outline: none;
+      padding-left: 10px;
+    }
+
+    .form_item label {
+      display: inline-block;
+      width: 100px;
+      text-align: right;
+      margin-right: 20px;
+    }
+
+    .submit_wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .submit_wrap .btn {
+      padding: 6px 40px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 10px;
+      margin-left: -40px;
+      background-color: #4f9d79;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="form">
+      <div class="form_item">
+        <label for="user_name">
+          User Name:
+        </label>
+        <input id="user_name" type="text" v-model="userName" placeholder="please input User Name">
+      </div>
+      <div class="form_item">
+        <label for="user_blo">
+          User Blo:
+        </label>
+        <input id="user_blo" type="text" v-model="userBlo" placeholder="please input User Blo">
+      </div>
+      <div class="form_item">
+        <label for="user_avatar">
+          User Avatar:
+        </label>
+        <input id="user_avatar" type="file" accept="image/png, image/jpeg,image/jpg" @change="uploadImg">
+      </div>
+      <div class="form_item submit_wrap">
+        <div class="btn" @click="submit">Submit</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          message: 'Hello Vue!',
+          userName: '',
+          userBlo: '',
+          avatar: ''
+        }
+      },
+      methods: {
+        uploadImg(e) {
+          const file = e.target.files[0]
+          let formData = new FormData()
+          formData.append('file', file, 'avatar.png')
+          axios({
+            url: 'http://localhost:8000/upload',
+            method: 'POST',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(res => {
+            const { path } = res.data.data
+            this.avatar = path
+          })
+        },
+
+        submit() {
+          console.log(11111)
+          const { userBlo, userName, avatar } = this
+          if (!userBlo) {
+            alert('Please input User Blo')
+            return
+          }
+          if (!userName) {
+            alert('Please input User Name')
+            return
+          }
+          axios.post('http://localhost:8000/setUserInfo', {
+            userBlo,
+            userName,
+            avatar
+          }).then(res => {
+            console.log(res.data.code)
+            if (res.data.code === 200) {
+              alert('Success!!!')
+              location.href = './index.html'
+            } else {
+              alert('Failed')
+            }
+          })
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>

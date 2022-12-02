@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width; initial-scale=1.0;  minimum-scale=1.0; maximum-scale=1.0">
-		<title>标题</title>
-		<link rel="stylesheet" href="css/style.css">
-	</head>
-	<body>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width; initial-scale=1.0;  minimum-scale=1.0; maximum-scale=1.0">
+	<title>profilepage</title>
+	<link rel="stylesheet" href="css/style.css">
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.2.0/axios.js"></script>
+</head>
+
+<body>
+	<div id="app">
 		<div class="main">
 			<div class="top">
-				< <span>HomePage</span>
+				<span>HomePage</span>
 			</div>
 			<div class="content">
 				<div class="cleft">
 					<div class="logo">
-						<img src="images/logo.png">
+						<img :src="'http://localhost:8000/' + avatar || 'images/logo.png'">
 					</div>
 					<div class="rtext">
-						<h2>USER NAME</h2>
-						<h3>USER BLO</h3>
+						<h2>{{userName}}</h2>
+						<h3>{{userBlo}}</h3>
 						<p>CURRENT LEVEL</p>
 					</div>
 				</div>
@@ -28,11 +33,45 @@
 						<p>Coins: CURRENT Coins</p>
 						<p>Score: CURRENT Question Score</p>
 					</div>
-					<div class="addbtn">
+					<a class="addbtn" href="./edit.html">
 						<button id="myaddbtn">Customize</button>
-					</div>
+					</a>
 				</div>
 			</div>
 		</div>
-	</body>
+	</div>
+
+	<script>
+		const { createApp } = Vue
+
+		createApp({
+			data() {
+				return {
+					message: 'Hello Vue!',
+					userName: 'USER NAME',
+					userBlo: 'USER BLO',
+					avatar: ''
+				}
+			},
+
+			mounted() {
+				this.getUserInfo()
+			},
+
+			methods: {
+				getUserInfo() {
+					axios.get('http://localhost:8000/getUserInfo').then(res => {
+						if (res.data.code === 200) {
+							const { userBlo, userName, avatar } = res.data.data
+							this.userBlo = userBlo
+							this.userName = userName
+							this.avatar = avatar
+						}
+					})
+				}
+			}
+		}).mount('#app')
+	</script>
+</body>
+
 </html>
